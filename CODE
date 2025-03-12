@@ -1,0 +1,227 @@
+#include <BluetoothSerial.h>
+
+BluetoothSerial SerialBT;
+
+#define TOUCH_PIN_0 4  // Pinul capacitiv TOUCH0
+#define TOUCH_PIN_2 2  // Pinul capacitiv TOUCH2
+#define TOUCH_PIN_8 33  // Pinul capacitiv TOUCH8
+
+#define LED_PIN_1 16
+#define LED_PIN_2 17
+#define LED_PIN_3 18
+#define LED_PIN_4 19
+#define LED_PIN_5 9
+#define LED_PIN_6 10
+#define LED_PIN_7 11
+#define LED_PIN_8 12
+#define A 25
+#define B 14
+#define C 3
+#define D 27
+#define E 32
+#define F 26
+#define G 13
+#define D1 0
+#define D2 15
+
+bool isTouch0Pressed = false;
+bool isTouch2Pressed = false;
+bool isTouch8Pressed = false;
+
+const int ledPins[] = {LED_PIN_1, LED_PIN_2, LED_PIN_3, LED_PIN_4, LED_PIN_5, LED_PIN_6, LED_PIN_7, LED_PIN_8};
+const int numLeds = sizeof(ledPins) / sizeof(ledPins[0]); //numarul de LED-uri
+
+
+void startGame1() {    // cod pentru jocul de lumini 1
+t1();
+for (int i = 0; i < 4; i++) {
+digitalWrite(ledPins[i], HIGH);
+delay(500); // 2Hz
+}
+}
+
+void startGame2() {     // cod pentru jocul de lumini 2
+  t2();
+for (int i = numLeds; i >= 4; i--) {
+digitalWrite(ledPins[i], HIGH);
+delay(1000); // 1Hz
+}
+}
+
+void startGame3() {  // functie pentru jocul de lumini 3
+ t3();
+while (isTouch8Pressed) {
+for (int i = 0; i < numLeds; i += 2) {
+digitalWrite(ledPins[i], HIGH);
+digitalWrite(ledPins[i + 1], HIGH);
+delay(2000); // 0.5Hz
+digitalWrite(ledPins[i], LOW);
+digitalWrite(ledPins[i + 1], LOW);
+delay(2000); // 0.5Hz
+}
+}
+}
+
+void turnOffLeds() {            //functie pentru a inchide ledurile
+for (int i = 0; i < numLeds; i++) {
+digitalWrite(ledPins[i], LOW);
+}
+}
+
+void t1()
+{
+  digitalWrite(D1,LOW); //DIGIT1
+  digitalWrite(D2,HIGH); //DIGIT2
+  digitalWrite(A,LOW); //a
+  digitalWrite(B,LOW); //b
+  digitalWrite(C,LOW); //c
+  digitalWrite(D,HIGH); //d
+  digitalWrite(E,HIGH); //e
+  digitalWrite(F,HIGH); //f
+  digitalWrite(G,HIGH); // g
+ 
+  delay(5);
+  digitalWrite(D1,HIGH); //DIGIT1
+  digitalWrite(D2,LOW); //DIGIT2
+  digitalWrite(A,LOW); //a
+  digitalWrite(B,HIGH); //b
+  digitalWrite(C,HIGH); //c
+  digitalWrite(D,LOW); //d
+  digitalWrite(E,LOW); //e
+  digitalWrite(F,LOW); //f
+  digitalWrite(G,LOW); // g
+ 
+  delay(5);
+}
+
+void t2()
+{
+  digitalWrite(D1,LOW); //DIGIT1
+  digitalWrite(D2,HIGH); //DIGIT2
+  digitalWrite(A,LOW); //a
+  digitalWrite(B,LOW); //b
+  digitalWrite(C,LOW); //c
+  digitalWrite(D,HIGH); //d
+  digitalWrite(E,HIGH); //e
+  digitalWrite(F,HIGH); //f
+  digitalWrite(G,HIGH); // g
+ 
+  delay(5);
+  digitalWrite(D1,HIGH); //DIGIT1
+  digitalWrite(D2,LOW); //DIGIT2
+  digitalWrite(A,HIGH); //a
+  digitalWrite(B,HIGH); //b
+  digitalWrite(C,LOW); //c
+  digitalWrite(D,HIGH); //d
+  digitalWrite(E,HIGH); //e
+  digitalWrite(F,LOW); //f
+  digitalWrite(G,HIGH); // g
+ 
+  delay(5);
+}
+
+void t3()
+{
+  digitalWrite(D1,LOW); //DIGIT1
+  digitalWrite(D2,HIGH); //DIGIT2
+  digitalWrite(A,LOW); //a
+  digitalWrite(B,LOW); //b
+  digitalWrite(C,LOW); //c
+  digitalWrite(D,HIGH); //d
+  digitalWrite(E,HIGH); //e
+  digitalWrite(F,HIGH); //f
+  digitalWrite(G,HIGH); // g
+ 
+  delay(5);
+  digitalWrite(D1,HIGH); //DIGIT1
+  digitalWrite(D2,LOW); //DIGIT2
+  digitalWrite(A,HIGH); //a
+  digitalWrite(B,HIGH); //b
+  digitalWrite(C,HIGH); //c
+  digitalWrite(D,HIGH); //d
+  digitalWrite(E,LOW); //e
+  digitalWrite(F,LOW); //f
+  digitalWrite(G,HIGH); // g
+ 
+  delay(5);
+}
+
+void t_off()
+{
+  digitalWrite(D1,LOW); //DIGIT1
+  digitalWrite(D2,HIGH); //DIGIT2
+  digitalWrite(A,LOW); //a
+  digitalWrite(B,LOW); //b
+  digitalWrite(C,LOW); //c
+  digitalWrite(D,LOW); //d
+  digitalWrite(E,LOW); //e
+  digitalWrite(F,LOW); //f
+  digitalWrite(G,LOW); // g
+  delay(5);
+  digitalWrite(D1, HIGH); //DIGIT1
+  digitalWrite(D2,LOW); //DIGIT2
+  digitalWrite(A,LOW); //a
+  digitalWrite(B,LOW); //b
+  digitalWrite(C,LOW); //c
+  digitalWrite(D,LOW); //d
+  digitalWrite(E,LOW); //e
+  digitalWrite(F,LOW); //f
+  digitalWrite(G,LOW); // g
+  delay(5);
+}
+
+void setup() {
+  SerialBT.begin("Arduino");  // Numele Bluetooth pentru conexiune
+  pinMode(TOUCH_PIN_0, INPUT);
+  pinMode(TOUCH_PIN_2, INPUT);
+  pinMode(TOUCH_PIN_8, INPUT);
+
+  for (int i = 0; i < numLeds; i++) {   //Setarea ledurilor
+    pinMode(ledPins[i], OUTPUT);
+    digitalWrite(ledPins[i], LOW);
+  }
+}
+
+void loop() {
+  // Verifica daca pinul TOUCH0 este apasat
+  if (digitalRead(TOUCH_PIN_0) == HIGH && !isTouch0Pressed) {
+    isTouch0Pressed = true;
+    isTouch2Pressed = false;
+    isTouch8Pressed = false;
+    SerialBT.println("Pinul TOUCH0 este apasat");
+    startGame1();
+  } else if (digitalRead(TOUCH_PIN_0) == LOW && isTouch0Pressed) {
+    isTouch0Pressed = false;
+    SerialBT.println("Pinul TOUCH0 nu mai este apasat");
+    turnOffLeds();
+    t_off();
+  }
+
+  // Verifica daca pinul TOUCH2 este apasat
+  if (digitalRead(TOUCH_PIN_2) == HIGH && !isTouch2Pressed) {
+    isTouch2Pressed = true;
+    isTouch0Pressed = false;
+    isTouch8Pressed = false;
+    SerialBT.println("Pinul TOUCH2 este apasat");
+    startGame2();
+  } else if (digitalRead(TOUCH_PIN_2) == LOW && isTouch2Pressed) {
+    isTouch2Pressed = false;
+    SerialBT.println("Pinul TOUCH2 nu mai este apasat");
+    turnOffLeds();
+    t_off();
+  }
+
+  // Verifica daca pinul TOUCH8 este apasat
+  if (digitalRead(TOUCH_PIN_8) == HIGH && !isTouch8Pressed) {
+    isTouch8Pressed = true;
+    isTouch0Pressed = false;
+    isTouch2Pressed = false;
+    SerialBT.println("Pinul TOUCH8 este apasat");
+    startGame3();
+  } else if (digitalRead(TOUCH_PIN_8) == LOW && isTouch8Pressed) {
+  isTouch8Pressed = false;
+  SerialBT.println("Pinul TOUCH8 nu mai este apasat");
+  turnOffLeds();
+  t_off();
+  }
+}
